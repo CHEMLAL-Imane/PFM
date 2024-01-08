@@ -7,6 +7,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),  # Use a different path for the home view
     path('store/', include('store.urls')),  # Use 'store/' as the path for store app
+path('cart/',include('carts.urls')),
+
 ]
 # Configuration pour servir les fichiers médias pendant le développement
 if settings.DEBUG:
