@@ -5,7 +5,7 @@ from .models import Cart, CartItem
 # Create your views here.
 from django.http import HttpResponse
 
-def cart_id(request):
+def _cart_id(request):
     cart = request.session.session_key
     if not cart:
         cart = request.session.create()
@@ -14,10 +14,10 @@ def cart_id(request):
 def add_cart(request, product_id):
     product= Product.objects.get(id=product_id) #get the product
     try:
-        cart = Cart.objects.get(cart_id= cart_id(request)) #get the cart using the cart_id oresent in the session
+        cart = Cart.objects.get(cart_id= _cart_id(request)) #get the cart using the cart_id oresent in the session
     except Cart.DoesNotExist:
         cart=Cart.objects.create(
-            cart_id = cart_id(request)
+            cart_id = _cart_id(request)
         )
     cart.save()
 
@@ -32,11 +32,16 @@ def add_cart(request, product_id):
             cart = cart,
         )
         cart_item.save()
-    return HttpResponse(cart_item.quantity)
-    exit()
-    return redirect('cart')
+        return redirect('cart')
+    
+   
 
 
 
 def cart(request):
-    return render(request, 'store/cart.html')
+    try:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+    except Cart.DoesNotExist:
+        cart = None
+
+    return render(request, 'store/cart.html', {'cart': cart})
