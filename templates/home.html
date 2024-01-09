@@ -17,7 +17,7 @@
             <div class="col-md-6">
                <!-- Texte de présentation -->
                <h2 class="display-4">Bienvenue sur notre boutique en ligne</h2>
-               <p class="lead">Découvrez une sélection exclusive de produits de haute qualité. Trouvez ce dont vous avez besoin et explorez nos offres spéciales.</p>
+               <p class="lead">Explorez notre sélection exclusive de produits de haute qualité. Découvrez ce dont vous avez besoin et profitez de nos offres spéciales.</p>
                <a href="#" class="btn btn-primary btn-lg">Explorer la boutique</a>
             </div>
          </div>
@@ -41,8 +41,6 @@
                <a href="{{ product.get_url }}" class="img-wrap">
                   <img src="{{ product.images.url }}" alt="{{ product.product_name }}">
                </a>
-<!-- Modifiez cette ligne pour supprimer le lien vers category_list -->
-<a href="#" class="btn btn-outline-primary">Explore Products</a>
                <figcaption class="info-wrap">
                   <a href="{{ product.get_url }}" class="title">{{ product.product_name }}</a>
                   <div class="price mt-1">${{ product.price }}</div> <!-- price-wrap.// -->
