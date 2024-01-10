@@ -11,7 +11,8 @@ urlpatterns = [
     path('cart/',include('carts.urls')),
     path('accounts/',include('accounts.urls')),
 
-
+#orders
+path('orders/', include('orders.urls')),
 ]
 # Configuration pour servir les fichiers médias pendant le développement
 if settings.DEBUG:
