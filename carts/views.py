@@ -13,23 +13,23 @@ def _cart_id(request):
     return cart
 
 
-# def add_cart(request, product_id):
-#     if request.method == 'POST':
-#         try:
-#             color = request.POST.get('color', 'DefaultColor')
-#             size = request.POST.get('size', 'DefaultSize')
-
-#             print(color, size)
-#             # Rest of your code to handle the cart logic
-#         except Exception as e:
-#             print(f"An error occurred: {e}")
-
 def add_cart(request, product_id):
-    if request.method == 'POST':  
-        color = request.POST['color']
-        size= request.POST['size']
+    if request.method == 'POST':
+        try:
+            color = request.POST.get('color', 'DefaultColor')
+            size = request.POST.get('size', 'DefaultSize')
 
-        print(color, size)
+            print(color, size)
+            # Rest of your code to handle the cart logic
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+# def add_cart(request, product_id):
+#     if request.method == 'POST':  
+#         color = request.POST['color']
+#         size= request.POST['size']
+
+#         print(color, size)
 
 
     product= Product.objects.get(id=product_id) #get the product
