@@ -1,10 +1,8 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 from store.models import Product
 from .models import Cart, CartItem
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist
-# Create your views here.
-from django.http import HttpResponse
 
 def _cart_id(request):
     cart = request.session.session_key
@@ -12,114 +10,77 @@ def _cart_id(request):
         cart = request.session.create()
     return cart
 
+def cart(request, total=0, quantity=0, cart_items=None):
+    try:
+        tax = 0
+        grand_total = 0
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart, product__user=request.user, is_active=True)
+
+        for cart_item in cart_items:
+            total += (cart_item.product.price * cart_item.quantity)
+            quantity += cart_item.quantity
+
+        tax = (2 * total) / 100
+        grand_total = total + tax
+    except ObjectDoesNotExist:
+        pass
+
+    context = {
+        'total': total,
+        'quantity': quantity,
+        'cart_items': cart_items,
+        'tax': tax,
+        'grand_total': grand_total,
+    }
+
+    return render(request, 'store/cart.html', context)
 
 def add_cart(request, product_id):
-    if request.method == 'POST':
-        try:
-            color = request.POST.get('color', 'DefaultColor')
-            size = request.POST.get('size', 'DefaultSize')
-
-            print(color, size)
-            # Rest of your code to handle the cart logic
-        except Exception as e:
-            print(f"An error occurred: {e}")
-
-# def add_cart(request, product_id):
-#     if request.method == 'POST':  
-#         color = request.POST['color']
-#         size= request.POST['size']
-
-#         print(color, size)
-
-
-    product= Product.objects.get(id=product_id) #get the product
+    product = Product.objects.get(id=product_id)
     try:
-        cart = Cart.objects.get(cart_id= _cart_id(request)) #get the cart using the cart_id present in the session
+        cart = Cart.objects.get(cart_id=_cart_id(request))
     except Cart.DoesNotExist:
-        cart=Cart.objects.create(
-            cart_id = _cart_id(request)
+        cart = Cart.objects.create(
+            cart_id=_cart_id(request)
         )
-    cart.save()
+        cart.save()
 
     try:
         cart_item = CartItem.objects.get(product=product, cart=cart)
-        cart_item.quantity += 1 
+        if cart_item.quantity < cart_item.product.stock:
+            cart_item.quantity += 1
         cart_item.save()
     except CartItem.DoesNotExist:
         cart_item = CartItem.objects.create(
-            product = product,
-            quantity = 1,
-            cart = cart,
+            product=product,
+            quantity=1,
+            cart=cart
         )
         cart_item.save()
-   
+
     return redirect('cart')
 
-
-
-def remove_cart(request,product_id):
+def remove_cart(request, product_id):
     cart = Cart.objects.get(cart_id=_cart_id(request))
-    product = get_object_or_404(Product , id=product_id) 
-    cart_item=CartItem.objects.get(product=product,cart=cart)
-    if cart_item.quantity>1 :
-         cart_item.quantity -= 1
-         cart_item.save()
-    else :
-        cart_item.delete()
-    return redirect('cart')   
-
- 
-def remove_cart_item(request,product_id):
-    cart = Cart.objects.get(cart_id = _cart_id(request))
-    product = get_object_or_404(Product, id= product_id)
-    cart_item= CartItem.objects.get(product=product,cart=cart)
+    product = Product.objects.get(id=product_id)
+    cart_item = CartItem.objects.get(product=product, cart=cart)
     cart_item.delete()
     return redirect('cart')
+
+def remove_cart_item(request, product_id):
+    cart = Cart.objects.get(cart_id=_cart_id(request))
+    product = Product.objects.get(id=product_id)
+    cart_item = CartItem.objects.get(product=product, cart=cart)
     
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    else:
+        cart_item.delete()
     
-def cart(request,total=0 , quantity=0,cart_items=None):
+    return redirect('cart')
 
-    try :
-        tax = 0
-        grand_total = 0
-        cart= Cart.objects.get(cart_id=_cart_id(request))
-        cart_items = CartItem.objects.filter(cart=cart,is_active=True)
-        for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-            quantity += cart_item.quantity
-        tax =(2*total)/100
-        grand_total=total + tax   
-    except ObjectDoesNotExist:
-        pass
-    context = {
-        'total':total,
-        'quantity':quantity,
-        'cart_items':cart_items,
-        'tax':tax,
-        'grand_total':grand_total,
-        }
-          
-    return render(request,'store/cart.html',context)
-
-
-def checkout(request,total=0 , quantity=0,cart_items=None):
-    try :
-        tax = 0
-        grand_total = 0
-        cart= Cart.objects.get(cart_id=_cart_id(request))
-        cart_items = CartItem.objects.filter(cart=cart,is_active=True)
-        for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-            quantity += cart_item.quantity
-        tax =(2*total)/100
-        grand_total=total + tax   
-    except ObjectDoesNotExist:
-        pass
-    context = {
-        'total':total,
-        'quantity':quantity,
-        'cart_items':cart_items,
-        'tax':tax,
-        'grand_total':grand_total,
-        }
-    return render(request,'store/checkout.html',context)
+def checkout(request):
+    # Ajoutez le code de votre vue checkout ici
+    return render(request, 'store/checkout.html')  # Assurez-vous d'ajuster le template selon vos besoins
