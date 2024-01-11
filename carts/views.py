@@ -3,6 +3,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from store.models import Product
 from .models import Cart, CartItem
+from django.contrib.auth.decorators import login_required
+
 
 def _cart_id(request):
     cart = request.session.session_key
