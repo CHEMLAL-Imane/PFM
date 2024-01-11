@@ -94,7 +94,6 @@ def login (request):
          return redirect('dashboard')
 
     return render(request,'accounts/login.html')
-
 @login_required(login_url = 'login')
 def logout(request):
     auth.logout(request)
