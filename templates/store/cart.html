@@ -34,7 +34,7 @@
 
                 <figcaption class="info">
                     <a href="#" class="title text-dark">{{ cart_item.product.product_name}}</a>
-                    <p class="text-muted small"> color : grey<br> Brand: Canon</p>
+                    <p class="text-muted small"> <br> Brand: Canon</p>
                 </figcaption>
             </figure>
         </td>
@@ -59,7 +59,7 @@
             </div> <!-- price-wrap .// -->
         </td>
         <td class="text-right"> 
-        <a href="{% url 'remove_cart_item' cart_item.product.id %}" class="btn btn-danger">Remove</a>
+            <a href="" class="btn btn-danger">Remove</a>
         </td>
     </tr>
     {% endfor %}
